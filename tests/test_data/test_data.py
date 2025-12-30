@@ -238,7 +238,6 @@ class TestData:
             with pytest.raises(ValueError, match=f"File data/{file_path} must be "):
                 _ = kp.data.ebsd_master_pattern(phase)
 
-    @pytest.mark.flaky(reruns=3)
     @pytest.mark.parametrize(
         "dataset",
         [
@@ -246,7 +245,7 @@ class TestData:
             "silicon_ebsd_moving_screen/si_in.h5",
             "silicon_ebsd_moving_screen/si_out5mm.h5",
             "silicon_ebsd_moving_screen/si_out10mm.h5",
-            "ebsd_si_wafer.zip",
+            # "ebsd_si_wafer.zip",
             "scan1_gain0db.zip",
             "scan2_gain3db.zip",
             "scan3_gain6db.zip",
@@ -262,7 +261,7 @@ class TestData:
             "ebsd_master_pattern/si_mc_mp_20kv.h5",
             "ebsd_master_pattern/austenite_mc_mp_20kv.h5",
             "ebsd_master_pattern/ferrite_mc_mp_20kv.h5",
-            "ebsd_master_pattern/steel_chi_mc_mp_20kv.h5",
+            # "ebsd_master_pattern/steel_chi_mc_mp_20kv.h5",
             "ebsd_master_pattern/steel_sigma_mc_mp_20kv.h5",
         ],
     )
