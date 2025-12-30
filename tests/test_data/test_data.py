@@ -246,7 +246,8 @@ class TestData:
             "silicon_ebsd_moving_screen/si_in.h5",
             "silicon_ebsd_moving_screen/si_out5mm.h5",
             "silicon_ebsd_moving_screen/si_out10mm.h5",
-            "ebsd_si_wafer.zip",
+            # TODO: uncomment and allow download test when Zenodo is working again.
+            #            "ebsd_si_wafer.zip",
             "scan1_gain0db.zip",
             "scan2_gain3db.zip",
             "scan3_gain6db.zip",
