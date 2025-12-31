@@ -22,6 +22,7 @@ from pathlib import Path
 from dask.array import Array
 import numpy as np
 import pytest
+import sleep
 
 import kikuchipy as kp
 from kikuchipy.data._data import Dataset, marshall
@@ -45,7 +46,9 @@ class TestData:
         assert dset.is_in_package
         assert not dset.is_in_cache
         assert not dset.is_in_collection
-        assert dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        assert (
+            dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        )
         assert str(dset.file_directory) == file_path.split("/")[0]
         assert dset.md5_hash == "f5e24fc55befedd08ee1b5a507e413ad"
 
@@ -84,6 +87,7 @@ class TestData:
         assert isinstance(mp_lazy, kp.signals.LazyEBSDMasterPattern)
         assert isinstance(mp_lazy.data, Array)
 
+    @pytest.mark.download
     def test_not_allow_download_raises(self, nickel_ebsd_large_h5ebsd_renamed):
         """Not passing `allow_download` raises expected error.
 
@@ -94,6 +98,7 @@ class TestData:
         with pytest.raises(ValueError, match=f"File data/{file_path}"):
             _ = kp.data.nickel_ebsd_large()
 
+    @pytest.mark.download
     def test_load_ni_ebsd_large_allow_download(self):
         """Download from external."""
         s = kp.data.nickel_ebsd_large(lazy=True, allow_download=True)
@@ -102,6 +107,7 @@ class TestData:
         assert s.data.shape == (55, 75, 60, 60)
         assert np.issubdtype(s.data.dtype, np.uint8)
 
+    @pytest.mark.download
     def test_load_si_ebsd_moving_screen(self):
         """Download external Si pattern."""
         s = kp.data.si_ebsd_moving_screen(allow_download=True)
@@ -120,7 +126,9 @@ class TestData:
         assert not dset.is_in_package
         assert dset.is_in_collection
         assert dset.url is not None
-        assert dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        assert (
+            dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        )
         assert str(dset.file_directory) == file_path.split("/")[0]
 
         if dset.file_path.exists():
@@ -128,7 +136,9 @@ class TestData:
             assert isinstance(s, kp.signals.LazyEBSD)
         else:
             assert dset.md5_hash is None
-            with pytest.raises(ValueError, match=f"File data/{file_path} must be "):
+            with pytest.raises(
+                ValueError, match=f"File data/{file_path} must be "
+            ):
                 _ = kp.data.si_wafer()
 
     @pytest.mark.parametrize(
@@ -152,11 +162,15 @@ class TestData:
         """
         file_path = f"ni_gain/{number}/Pattern.dat"
 
-        dset = Dataset(file_path, collection_name=f"scan{number}_gain{gain}db.zip")
+        dset = Dataset(
+            file_path, collection_name=f"scan{number}_gain{gain}db.zip"
+        )
         assert not dset.is_in_package
         assert dset.is_in_collection
         assert dset.url is not None
-        assert dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        assert (
+            dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        )
         assert str(dset.file_directory) == str(
             Path(file_path.split("/")[0]) / str(number)
         )
@@ -166,7 +180,9 @@ class TestData:
             assert isinstance(s, kp.signals.LazyEBSD)
         else:
             assert dset.md5_hash is None
-            with pytest.raises(ValueError, match=f"File data/{file_path} must be "):
+            with pytest.raises(
+                ValueError, match=f"File data/{file_path} must be "
+            ):
                 _ = kp.data.ni_gain(number)
 
     @pytest.mark.parametrize(
@@ -190,11 +206,15 @@ class TestData:
         """
         file_path = f"ni_gain/{number}/Setting.txt"
 
-        dset = Dataset(file_path, collection_name=f"scan{number}_gain{gain}db.zip")
+        dset = Dataset(
+            file_path, collection_name=f"scan{number}_gain{gain}db.zip"
+        )
         assert not dset.is_in_package
         assert dset.is_in_collection
         assert dset.url is not None
-        assert dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        assert (
+            dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        )
         assert str(dset.file_directory) == str(
             Path(file_path.split("/")[0]) / str(number)
         )
@@ -204,7 +224,9 @@ class TestData:
             assert isinstance(s, kp.signals.LazyEBSD)
         else:
             assert dset.md5_hash is None
-            with pytest.raises(ValueError, match=f"File data/{file_path} must be "):
+            with pytest.raises(
+                ValueError, match=f"File data/{file_path} must be "
+            ):
                 _ = kp.data.ni_gain_calibration(number)
 
     @pytest.mark.parametrize(
@@ -227,7 +249,9 @@ class TestData:
         assert not dset.is_in_package
         assert not dset.is_in_collection
         assert dset.url is not None
-        assert dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        assert (
+            dset.file_relpath.resolve() == Path(f"data/{file_path}").resolve()
+        )
         assert str(dset.file_directory) == file_path.split("/")[0]
 
         if dset.file_path.exists():
@@ -235,13 +259,21 @@ class TestData:
             assert isinstance(s, kp.signals.LazyEBSDMasterPattern)
         else:
             assert dset.md5_hash is None
-            with pytest.raises(ValueError, match=f"File data/{file_path} must be "):
+            with pytest.raises(
+                ValueError, match=f"File data/{file_path} must be "
+            ):
                 _ = kp.data.ebsd_master_pattern(phase)
 
-    @pytest.mark.flaky(reruns=3)
-    @pytest.mark.parametrize(
-        "dataset",
-        [
+    @pytest.mark.download
+    def test_dataset_availability(self):
+        """Ping registry URLs of remote repositories (GitHub and Zenodo)
+        to check dataset availability.
+
+        Due to Zenodo's policy described in the blog post below, each
+        file is given three ping attempts with pauses between before failing.
+        https://blog.zenodo.org/2025/11/25/2025-11-14-search-api-updates/
+        """
+        datasets = [
             "nickel_ebsd_large/patterns.h5",
             "silicon_ebsd_moving_screen/si_in.h5",
             "silicon_ebsd_moving_screen/si_out5mm.h5",
@@ -264,10 +296,16 @@ class TestData:
             "ebsd_master_pattern/ferrite_mc_mp_20kv.h5",
             "ebsd_master_pattern/steel_chi_mc_mp_20kv.h5",
             "ebsd_master_pattern/steel_sigma_mc_mp_20kv.h5",
-        ],
-    )
-    def test_dataset_availability(self, dataset):
-        """Ping registry URLs of remote repositories (GitHub and Zenodo)
-        to check dataset availability.
-        """
-        assert marshall.is_available(f"data/{dataset}")
+        ]
+        failed_checks = []
+        for dset in datasets:
+            if not marshall.is_available(f"data/{dset}"):
+                # file unavailable, likely due to zenodo seeing too many
+                # requests. blog for reference:
+                #
+                failed_checks.append(dset)
+        for dset_retr in failed_checks:
+            if not marshall.is_available(f"data/{dset}"):
+                # allow cooldown before third attempt
+                sleep(30)
+                assert marshall.is_available(f"data/{dset}")
