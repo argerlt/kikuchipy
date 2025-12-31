@@ -22,7 +22,7 @@ from pathlib import Path
 from dask.array import Array
 import numpy as np
 import pytest
-import sleep
+import time
 
 import kikuchipy as kp
 from kikuchipy.data._data import Dataset, marshall
@@ -87,7 +87,7 @@ class TestData:
         assert isinstance(mp_lazy, kp.signals.LazyEBSDMasterPattern)
         assert isinstance(mp_lazy.data, Array)
 
-    @pytest.mark.download
+    @pytest.mark.test_downloads
     def test_not_allow_download_raises(self, nickel_ebsd_large_h5ebsd_renamed):
         """Not passing `allow_download` raises expected error.
 
@@ -98,7 +98,7 @@ class TestData:
         with pytest.raises(ValueError, match=f"File data/{file_path}"):
             _ = kp.data.nickel_ebsd_large()
 
-    @pytest.mark.download
+    @pytest.mark.test_downloads
     def test_load_ni_ebsd_large_allow_download(self):
         """Download from external."""
         s = kp.data.nickel_ebsd_large(lazy=True, allow_download=True)
@@ -107,7 +107,7 @@ class TestData:
         assert s.data.shape == (55, 75, 60, 60)
         assert np.issubdtype(s.data.dtype, np.uint8)
 
-    @pytest.mark.download
+    @pytest.mark.test_downloads
     def test_load_si_ebsd_moving_screen(self):
         """Download external Si pattern."""
         s = kp.data.si_ebsd_moving_screen(allow_download=True)
@@ -264,7 +264,7 @@ class TestData:
             ):
                 _ = kp.data.ebsd_master_pattern(phase)
 
-    @pytest.mark.download
+    @pytest.mark.test_downloads
     def test_dataset_availability(self):
         """Ping registry URLs of remote repositories (GitHub and Zenodo)
         to check dataset availability.
@@ -307,5 +307,5 @@ class TestData:
         for dset_retr in failed_checks:
             if not marshall.is_available(f"data/{dset}"):
                 # allow cooldown before third attempt
-                sleep(30)
+                time.sleep(30)
                 assert marshall.is_available(f"data/{dset}")

@@ -167,7 +167,7 @@ filterwarnings = [
     "ignore:Unable to import recommended hash 'siphash24.siphash13'",
 ]
 markers = [
-    "download: mark tests that validate only download features",
+    "test_downloads: mark tests that validate only download features",
 ]
 
 # https://docs.astral.sh/ruff/configuration

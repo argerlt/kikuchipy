@@ -36,7 +36,7 @@ jobs:
     timeout-minutes: 15
     env:
       MPLBACKEND: agg
-      PYTEST_ARGS: --cov-branch --cov-report=xml --reruns 2 -n 2 --cov=kikuchipy --downloads=False
+      PYTEST_ARGS: --cov-branch --cov-report=xml --reruns 2 -n 2 --cov=kikuchipy --test_downloads=False
       PYTEST_ARGS_DNLD: --cov-branch --cov-report=xml --reruns 2 -n 2 --cov=kikuchipy
     strategy:
       fail-fast: false

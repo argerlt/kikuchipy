@@ -94,15 +94,24 @@ def pytest_sessionstart(session):
 
 def pytest_addoption(parser):
     parser.addoption(
-        "--download",
+        "--test_downloads",
         action="store_true",
-        default=True,
+        default=False,
         help="Run tests related to download validation. Default is True",
     )
 
 
 # Markers are defined in package configuration
-MARKERS = ["download"]
+MARKERS = ["test_downloads"]
+
+
+def pytest_runtest_setup(item):
+    # Skip certain tests when flag is missing:
+    # https://docs.pytest.org/en/stable/reference/reference.html#pytest.hookspec.pytest_runtest_setup
+    for marker in MARKERS:
+        marker_str = f"--{marker}"
+        if marker in item.keywords and not item.config.getoption(marker_str):
+            pytest.skip(f"Needs {marker_str} flag to run")
 
 
 # ---------------------- pytest doctest-modules ---------------------- #

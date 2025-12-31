@@ -28,11 +28,17 @@ import warnings
 import dask.array as da
 from hyperspy._lazy_signals import LazySignal2D
 from hyperspy.signals import Signal2D
+from importlib.util import find_spec
 import numpy as np
 from packaging.version import Version
-from rsciio.utils.rgb_tools import rgb_dtypes
 from skimage.util.dtype import dtype_range
 import yaml
+
+if find_spec("rsciio.utils.rgb") is not None:
+    from rsciio.utils.rgb import RGB_DTYPES as rgb_dtypes
+else:
+    from rsciio.utils.rgb_tools import rgb_dtypes
+
 
 from kikuchipy.constants import dependency_version
 from kikuchipy.pattern._pattern import (
@@ -40,7 +46,9 @@ from kikuchipy.pattern._pattern import (
     normalize_intensity,
     rescale_intensity,
 )
-from kikuchipy.signals.util._overwrite_hyperspy_methods import insert_doc_disclaimer
+from kikuchipy.signals.util._overwrite_hyperspy_methods import (
+    insert_doc_disclaimer,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -85,7 +93,12 @@ class KikuchipySignal2D(Signal2D):
         in_range: tuple[int, int] | tuple[float, float] | None = None,
         out_range: tuple[int, int] | tuple[float, float] | None = None,
         dtype_out: (
-            str | np.dtype | type | tuple[int, int] | tuple[float, float] | None
+            str
+            | np.dtype
+            | type
+            | tuple[int, int]
+            | tuple[float, float]
+            | None
         ) = None,
         percentiles: tuple[int, int] | tuple[float, float] | None = None,
         show_progressbar: bool | None = None,
@@ -199,7 +212,9 @@ class KikuchipySignal2D(Signal2D):
 
         # Determine min./max. intensity of input image to rescale to
         if in_range is not None and percentiles is not None:
-            raise ValueError("'percentiles' must be None if 'in_range' is not None")
+            raise ValueError(
+                "'percentiles' must be None if 'in_range' is not None"
+            )
         elif relative is True and in_range is not None:
             raise ValueError("'in_range' must be None if 'relative' is True")
         elif relative:  # Scale relative to min./max. intensity in images
@@ -228,7 +243,10 @@ class KikuchipySignal2D(Signal2D):
             self._set_custom_attributes(attrs)
         else:
             s_out = self.map(
-                rescale_intensity, inplace=False, lazy_output=lazy_output, **map_kw
+                rescale_intensity,
+                inplace=False,
+                lazy_output=lazy_output,
+                **map_kw,
             )
             s_out._set_custom_attributes(attrs)
             return s_out
@@ -320,7 +338,10 @@ class KikuchipySignal2D(Signal2D):
             self._set_custom_attributes(attrs)
         else:
             s_out = self.map(
-                normalize_intensity, inplace=False, lazy_output=lazy_output, **map_kw
+                normalize_intensity,
+                inplace=False,
+                lazy_output=lazy_output,
+                **map_kw,
             )
             s_out._set_custom_attributes(attrs)
             return s_out
