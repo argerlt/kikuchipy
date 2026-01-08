@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 #
-# Copyright 2019-2025 the kikuchipy developers
+# Copyright 2019-2026 the kikuchipy developers
 #
 # This file is part of kikuchipy.
 #
@@ -37,7 +36,9 @@ class TestEMsoftTKDMasterPatternReader:
             (True, kp.signals.LazyEBSDMasterPattern),
         ],
     )
-    def test_file_reader(self, emsoft_tkd_master_pattern_file, lazy, class_type):
+    def test_file_reader(
+        self, emsoft_tkd_master_pattern_file, lazy, class_type
+    ):
         s = kp.load(emsoft_tkd_master_pattern_file, lazy=lazy)
         assert isinstance(s, class_type)
 

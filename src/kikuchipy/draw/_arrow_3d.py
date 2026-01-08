@@ -1,4 +1,5 @@
-# Copyright 2019-2025 The kikuchipy developers
+#
+# Copyright 2019-2026 the kikuchipy developers
 #
 # This file is part of kikuchipy.
 #

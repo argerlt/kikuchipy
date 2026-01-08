@@ -1,3 +1,4 @@
+#
 # Copyright 2019-2024 The kikuchipy developers
 #
 # This file is part of kikuchipy.
@@ -43,7 +44,9 @@ class TestIO:
             kp.load("im_not_here.h5")
 
     def test_dict2signal(self, kikuchipy_h5ebsd_path):
-        scan_dict, *_ = kp_h5ebsd_file_reader(kikuchipy_h5ebsd_path / "patterns.h5")
+        scan_dict, *_ = kp_h5ebsd_file_reader(
+            kikuchipy_h5ebsd_path / "patterns.h5"
+        )
         scan_dict["metadata"]["Signal"]["record_by"] = "not-image"
         with pytest.raises(ValueError, match="kikuchipy only supports"):
             _ = _dict2signal(scan_dict)
@@ -58,7 +61,9 @@ class TestIO:
             (np.dtype("uint8"), False, 2, ""),
         ],
     )
-    def test_assign_signal_subclass(self, dtype, lazy, signal_dimension, signal_type):
+    def test_assign_signal_subclass(
+        self, dtype, lazy, signal_dimension, signal_type
+    ):
         if "complex" in dtype.name:
             with pytest.raises(ValueError, match="Data type"):
                 _ = _assign_signal_subclass(
@@ -108,16 +113,25 @@ class TestIO:
 
     def test_save_data_dimensions(self, tmpdir):
         s = kp.signals.EBSD(np.zeros((2, 3, 4, 5, 6)))
-        with pytest.raises(ValueError, match="Chosen IO plugin 'kikuchipy_h5ebsd' "):
+        with pytest.raises(
+            ValueError, match="Chosen IO plugin 'kikuchipy_h5ebsd' "
+        ):
             s.save(tmpdir / "test.h5")
 
-    def test_save_to_existing_file(self, save_path_hdf5, kikuchipy_h5ebsd_path):
+    def test_save_to_existing_file(
+        self, save_path_hdf5, kikuchipy_h5ebsd_path
+    ):
         s = kp.load(kikuchipy_h5ebsd_path / "patterns.h5")
         s.save(save_path_hdf5)
         with pytest.warns(UserWarning, match="Your terminal does not"):
             s.save(save_path_hdf5, scan_number=2)
         with pytest.raises(ValueError, match="overwrite parameter can"):
-            s.save(save_path_hdf5, scan_number=2, overwrite="False", add_scan=False)
+            s.save(
+                save_path_hdf5,
+                scan_number=2,
+                overwrite="False",
+                add_scan=False,
+            )
         s.save(save_path_hdf5, scan_number=2, overwrite=False, add_scan=False)
         with pytest.raises(OSError, match="Scan 'Scan 2' is not among the"):
             _ = kp.load(save_path_hdf5, scan_group_names="Scan 2")

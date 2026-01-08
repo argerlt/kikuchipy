@@ -1,5 +1,5 @@
 #
-# Copyright 2019-2025 the kikuchipy developers
+# Copyright 2019-2026 the kikuchipy developers
 #
 # This file is part of kikuchipy.
 #
@@ -93,12 +93,7 @@ class KikuchipySignal2D(Signal2D):
         in_range: tuple[int, int] | tuple[float, float] | None = None,
         out_range: tuple[int, int] | tuple[float, float] | None = None,
         dtype_out: (
-            str
-            | np.dtype
-            | type
-            | tuple[int, int]
-            | tuple[float, float]
-            | None
+            str | np.dtype | type | tuple[int, int] | tuple[float, float] | None
         ) = None,
         percentiles: tuple[int, int] | tuple[float, float] | None = None,
         show_progressbar: bool | None = None,
@@ -212,9 +207,7 @@ class KikuchipySignal2D(Signal2D):
 
         # Determine min./max. intensity of input image to rescale to
         if in_range is not None and percentiles is not None:
-            raise ValueError(
-                "'percentiles' must be None if 'in_range' is not None"
-            )
+            raise ValueError("'percentiles' must be None if 'in_range' is not None")
         elif relative is True and in_range is not None:
             raise ValueError("'in_range' must be None if 'relative' is True")
         elif relative:  # Scale relative to min./max. intensity in images
