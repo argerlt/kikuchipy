@@ -27,6 +27,7 @@ name: Weekly_Tests
 # code coverage, and validating the documentation.
 
 on:
+  push:
   schedule:
     - cron: '15 6 * * 1'
   workflow_dispatch:
